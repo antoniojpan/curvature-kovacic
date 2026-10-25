@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "curvature-kovacic: constructive integration of scalar ODEs via Kovacic's algorithm"
+version: 1.0.0
+date-released: 2026-10-25
+license: MIT
+authors:
+  - family-names: "Pan-Collantes"
+    given-names: "Antonio J."
+  - family-names: "Alvarez-Garcia"
+    given-names: "J. A."
+abstract: >-
+  Companion code for the manuscript "From curvature to Kovacic: a geometric
+  approach to integrability of scalar ODEs".  It implements the three
+  constructive integration algorithms of the paper and a self-contained
+  SymPy version of Kovacic's algorithm.
+keywords:
+  - differential equations
+  - Kovacic algorithm
+  - Riccati equation
+  - symbolic computation
+  - integrability

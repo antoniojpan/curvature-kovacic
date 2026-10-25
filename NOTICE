@@ -1,0 +1,23 @@
+Attribution
+===========
+
+This package is an independent implementation of the algorithms described in
+
+    A. J. Pan-Collantes, J. A. Alvarez-Garcia,
+    "From curvature to Kovacic: a geometric approach to integrability of
+    scalar ODEs".
+
+The Kovacic solver follows the classical algorithm of
+
+    J. Kovacic, "An algorithm for solving second order linear homogeneous
+    differential equations", J. Symbolic Comput. 2 (1986), 3-43.
+
+The exposition and the public Maple package of
+
+    N. M. Abbasi, "Analysis and object oriented implementation of the
+    Kovacic algorithm", arXiv:2211.00804 (2022)
+
+were used as references while writing the SymPy implementation.  The code
+here is not a line-by-line translation of that package; all errors are ours.
+Users who redistribute this software should satisfy themselves that the
+attribution above is appropriate for their use.

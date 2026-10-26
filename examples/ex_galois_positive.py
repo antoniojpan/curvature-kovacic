@@ -12,16 +12,25 @@ The paper displays the Liouvillian solution
 
 of ``L(y) = y'' + (3/(16x^2) - 1/x) y = 0``, the first integral
 
-    I(x,u) = (1/2) x^{-1/4} exp(-2 sqrt(x)) (u + sqrt(u^2 - 4 sqrt(x)))
+    I(x,u) = x^{-1/4} exp(-2 sqrt(x)) (u + sqrt(u^2 - 4 sqrt(x)))
 
 and the family
 
     f(x;s) = s x^{1/4} exp(2 sqrt(x))
              + s^{-1} x^{1/4} exp(-2 sqrt(x)).
 
-This script runs the paper's pipeline (``alg:kovacic`` on the genuine
-nonlinear ``phi``) and checks the displayed formulas up to the standard
-freedom in the choice of first integral.
+Two normalizations have to be kept apart, and this script checks both.
+
+* Algorithm 1 with the displayed ``delta_+ = x^{1/4} exp(2 sqrt(x))``
+  returns ``I_+ = x^{-1/4} exp(2 sqrt(x)) (u - sqrt(u^2 - 4 sqrt(x)))``.
+  Since ``u^2 - (u^2 - 4 sqrt(x)) = 4 sqrt(x)``, one has ``I_+ * I = 4``:
+  the first integral printed in the paper is the reciprocal of the
+  algorithm's output, up to that constant.  Equivalently, the printed ``I``
+  is minus the output attached to the independent solution
+  ``delta_- = x^{1/4} exp(-2 sqrt(x))``.
+* The family printed in the paper is parametrized by ``s``; the algorithm
+  returns the same family parametrized by the initial value ``v = u(x0)``.
+  At ``x0 = 1`` they agree for ``s = exp(-2) (v + sqrt(v^2 - 4))/2``.
 """
 
 from __future__ import annotations
@@ -50,9 +59,9 @@ def main() -> None:
     kappa = sp.Rational(3, 16) / x**2 - 1 / x
 
     delta_paper = x ** sp.Rational(1, 4) * sp.exp(2 * sp.sqrt(x))
+    delta_minus = x ** sp.Rational(1, 4) * sp.exp(-2 * sp.sqrt(x))
     I_paper = (
-        sp.Rational(1, 2)
-        * x ** sp.Rational(-1, 4)
+        x ** sp.Rational(-1, 4)
         * sp.exp(-2 * sp.sqrt(x))
         * (u + sp.sqrt(u**2 - 4 * sp.sqrt(x)))
     )
@@ -86,8 +95,15 @@ def main() -> None:
     assert is_zero(result_a1.c, points)
 
     pts_a1 = points_from_family(result_a1.family, [sp.Rational(3, 2), 2], 3)
-    # With delta_+ = x^{1/4} e^{2 sqrt(x)}, alg:delta returns 2 / I_paper.
-    assert is_zero(result_a1.I * I_paper - 2, pts_a1)
+    # With delta_+ = x^{1/4} e^{2 sqrt(x)}, alg:delta returns the reciprocal
+    # of the first integral printed in the paper, up to the factor 4.
+    assert is_zero(result_a1.I * I_paper - 4, pts_a1)
+    # The printed I is minus the output attached to delta_-.
+    result_dm = solve_from_linear_solution(
+        phi, delta_minus, x0=1, v_value=3, points=points
+    )
+    assert result_dm.status == "ok", result_dm.message
+    assert is_zero(result_dm.I + I_paper, points)
     assert is_zero(
         sp.simplify(result_a1.family - f_paper),
         [{x: sp.Rational(3, 2), v: 3}, {x: 2, v: 3}],
@@ -115,8 +131,8 @@ def main() -> None:
 
     pts_a3 = points_from_family(result_a3.family, [sp.Rational(3, 2), 2], 3)
     # The solver's branch is delta_- = x^{1/4} e^{-2 sqrt(x)}, so the
-    # algorithm returns -2 I_paper.
-    assert is_zero(result_a3.I + 2 * I_paper, pts_a3)
+    # algorithm returns -I_paper.
+    assert is_zero(result_a3.I + I_paper, pts_a3)
     assert is_zero(
         sp.simplify(result_a3.family - f_paper),
         [{x: sp.Rational(3, 2), v: 3}, {x: 2, v: 3}],

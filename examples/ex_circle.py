@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Circle equation (``ex:example_sqrt``).
+"""Circle equation (``ex:nonlinear_proj``, equation ``eq:example_sqrt``).
 
 Equation:
 

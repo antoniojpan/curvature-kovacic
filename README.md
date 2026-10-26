@@ -79,8 +79,18 @@ The paper-oriented aliases `integrate_from_linear_solution`,
 | `examples/ex_galois_positive.py` | Kovacic's Example 1, Section 4.2 (`ex:galois_positive`) |
 | `examples/ex_euler_cauchy.py` | Euler--Cauchy family (`ex:euler_cauchy`) |
 | `examples/ex_particular_solution.py` | `alg:particular` on an affine Euler--Cauchy equation |
-| `examples/ex_circle.py` | Circle equation `u' = sqrt(1-u^2)/2` (`ex:example_sqrt`) |
+| `examples/ex_circle.py` | Circle equation `u' = sqrt(1-u^2)/2` (`ex:nonlinear_proj`, equation `eq:example_sqrt`) |
 | `examples/ex_airy_obstruction.py` | Airy obstruction (`ex:airy_obstruction`) |
+| `examples/ex_nomaple.py` | Algorithm 3 on the algebraic radical equation (`ex:nomaple`) |
+
+Maple counterparts of the three integration algorithms and all examples are
+provided in [`maple/`](maple/). They implement the same diagnostics
+(`outside_class`, `invalid_auxiliary_solution`, `invalid_particular_solution`,
+`not_rational`, `obstruction`, `solver_limited`), use Maple's
+`DEtools[kovacicsols]` for Kovacic's algorithm, and verify themselves with
+one `[pass]`/`[FAIL]` line per identity. They were tested with Maple 2015.0;
+`maple/transcript.txt` is the recorded output of `sh maple/run_all.sh`
+(121 checks, all passing). See `maple/README.md` for details.
 
 Run one with, for example,
 
@@ -91,6 +101,38 @@ python examples/ex_galois_positive.py
 Each script prints the curvature, the coefficient $c$, the auxiliary
 solution, the first integral and the local family, and verifies the
 identities used in the paper.
+
+## Relation to the paper
+
+The three procedures follow §8 literally; three presentation choices are
+worth knowing when comparing printed output with the paper.
+
+**Family parameter.** The procedures return `u(x;v)` with `v = u(x0)`,
+whereas the examples in the paper write `f(x;s)` with their own parameter.
+For the two instances where the paper uses `s`:
+
+- `ex:euler_cauchy`: the paper's `f(x;s) = s x^2 + s^{-1} x^{-1}` and the
+  returned family coincide for `s = (v + sqrt(v^2 - 8))/8` at `x0 = 2`
+  (checked in `examples/ex_euler_cauchy.py`);
+- `ex:galois_positive`: they coincide for
+  `s = exp(-2)(v + sqrt(v^2 - 4))/2` at `x0 = 1`.
+
+**First integrals are not unique.** Multiplying `delta` by a constant
+rescales `I` and `S`; replacing `delta` by the independent solution changes
+`I` nonlinearly; and any nonconstant function of a first integral is again a
+first integral. In `ex:galois_positive` the paper prints the first integral
+attached to `delta = x^{1/4} exp(-2 sqrt(x))`, while `alg:delta` applied to
+the displayed `x^{1/4} exp(2 sqrt(x))` returns its reciprocal up to the
+factor 4 (`I_+ * I = 4`). `examples/ex_galois_positive.py` checks both
+statements. Likewise `examples/ex_euler_cauchy.py` uses `delta = x^2`,
+whereas the continuation of that example in the paper derives
+`delta = x^2 - x^{-1}` from the particular solution with `s = 1`; both are
+nonzero solutions of the same `L`, as the construction allows.
+
+**Kovacic, step 4.** The implementation always takes the conservative
+branch: it returns the implicit solution and the family, but makes no claim
+about Liouvillianity of the solutions, which is what `alg:kovacic` asks for
+when it is not known that `c` is Liouvillian over `C(x)`.
 
 ## Verification
 
@@ -123,7 +165,11 @@ theorem.
 ## Scope and limitations
 
 - The algorithms are local.  The base point `x0` must satisfy
-  $\delta(x_0)\ne0$, and `v_value` must lie in the domain of $\phi$.
+  $\delta(x_0)\ne0$; violating this is reported as
+  `invalid_auxiliary_solution`, not as a silent failure.  `v_value` must
+  lie in the domain of $\phi$, and membership of $(x,\tilde f(x))$ in the
+  domain — which `alg:particular` step 2 asks to check — cannot be decided
+  symbolically and remains the caller's responsibility.
 - The symbolic simplification in `rational_curvature` and `refine_delta`
   are heuristics that help SymPy recognise a rational curvature and choose
   the branch adapted to $x>0$.  They are not part of the mathematical

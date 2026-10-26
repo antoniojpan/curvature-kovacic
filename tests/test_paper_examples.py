@@ -1,5 +1,8 @@
 """Checks tied to the formulas displayed in the paper."""
 
+import runpy
+from pathlib import Path
+
 import sympy as sp
 
 from curvature_kovacic import (
@@ -90,3 +93,10 @@ def test_circle_family_is_the_printed_solution():
         sp.simplify(result.family.subs(v, 0) - sp.sin(x / 2)),
         [{x: sp.Rational(1, 2)}, {x: 1}],
     )
+
+
+def test_nomaple_script_reproduces_the_printed_example():
+    """Run all exact checks in the companion script for ``ex:nomaple``."""
+    script = Path(__file__).resolve().parents[1] / "examples" / "ex_nomaple.py"
+    namespace = runpy.run_path(str(script))
+    namespace["main"]()

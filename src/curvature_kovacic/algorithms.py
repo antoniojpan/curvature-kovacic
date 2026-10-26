@@ -92,6 +92,15 @@ def solve_from_linear_solution(phi: sp.Expr, delta: sp.Expr, x0: sp.Expr,
             message="L(delta) != 0",
         )
 
+    if is_zero(delta.subs(x, x0), [{x: x0}]):
+        return AlgorithmResult(
+            AlgorithmStatus.INVALID_AUXILIARY_SOLUTION,
+            kappa=kappa,
+            c=c,
+            delta=delta,
+            message="delta(x0) == 0: choose another base point",
+        )
+
     S = safe_simplify(sp.diff(delta, x) - sp.diff(phi, u) * delta)
     Q = integral_from(delta * c, x0)
 
@@ -290,7 +299,7 @@ def kovacic_integration(phi: sp.Expr, x0: sp.Expr, v_value: sp.Expr = 0,
             AlgorithmStatus.OBSTRUCTION,
             kappa=kappa,
             c=c,
-            message="no nonzero Liouvillian solution over C(x)",
+            message="at most one Liouvillian solution over C(x)",
         )
     if status in ("solver_limited", "not_found"):
         return AlgorithmResult(

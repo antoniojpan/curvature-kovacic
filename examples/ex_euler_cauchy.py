@@ -65,6 +65,17 @@ def main() -> None:
     )
     _report(result_a3, phi, kappa, x0, v0, x_values)
 
+    # The paper prints the family f(x;s) = s x^2 + 1/(s x).  The algorithms
+    # return the same family parametrized by the initial value v = u(x0);
+    # at x0 = 2 the two parameters are related by s = (v + sqrt(v^2 - 8))/8.
+    s_of_v = (v + sp.sqrt(v**2 - 8)) / 8
+    paper_family = s_of_v * x**2 + 1 / (s_of_v * x)
+    assert is_zero(
+        result_a1.family - paper_family,
+        [{x: x0, v: v0}, {x: 3, v: v0}],
+    )
+    print("Family matches f(x;s) = s x^2 + 1/(s x) of the paper.")
+
     print("\nAll checks passed.")
 
 

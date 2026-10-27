@@ -18,6 +18,7 @@ scalar ODE; ``v`` is the parameter of the solution family.
 from __future__ import annotations
 
 from collections.abc import Iterable, Mapping
+from functools import lru_cache
 
 import sympy as sp
 
@@ -48,14 +49,28 @@ def A(f: sp.Expr, phi: sp.Expr) -> sp.Expr:
     return sp.diff(f, x) + phi * sp.diff(f, u)
 
 
+@lru_cache(maxsize=16)
+def divergence(phi: sp.Expr) -> sp.Expr:
+    """Divergence along solutions, ``A(phi) = phi_x + phi phi_u``, simplified.
+
+    It is simplified once, before any differentiation in ``u``.  For an
+    equation written with nested radicals this is what keeps the curvature
+    computation tractable: the identity ``A(phi) = -kappa(x) u + c(x)`` is a
+    simplification of ``A(phi)`` itself, not of its ``u``-derivative.  The
+    result is cached because ``curvature`` and ``c_coefficient`` both need
+    it, and the simplification can be expensive.
+    """
+    return safe_simplify(A(phi, phi))
+
+
 def curvature(phi: sp.Expr) -> sp.Expr:
     """Gauss curvature ``K(x,u) = -d/du(A(phi))`` of the associated surface."""
-    return safe_simplify(-sp.diff(A(phi, phi), u))
+    return safe_simplify(-sp.diff(divergence(phi), u))
 
 
 def c_coefficient(phi: sp.Expr, kappa: sp.Expr) -> sp.Expr:
     """The ``u``-independent coefficient ``c(x) = A(phi) + kappa u``."""
-    return safe_simplify(A(phi, phi) + kappa * u)
+    return safe_simplify(divergence(phi) + kappa * u)
 
 
 def integral_from(expr: sp.Expr, x0: sp.Expr) -> sp.Expr:

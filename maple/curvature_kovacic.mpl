@@ -152,15 +152,41 @@ end proc:
 # Geometric coefficients
 ##############################################################################
 
+# CK_divergence(phi): A(phi) = phi_x + phi phi_u, simplified once, before
+# any differentiation in u.  For equations written with nested radicals this
+# is what keeps the curvature computation tractable: the identity
+# A(phi) = -kappa u + c is a simplification of A(phi) itself.
+CK_divergence := proc(phi)
+    local Aphi;
+    Aphi := simplify(diff(phi, x) + phi*diff(phi, u)):
+    if has(Aphi, u) then
+        try
+            Aphi := radnormal(Aphi):
+        catch:
+        end try:
+    end if:
+    return Aphi:
+end proc:
+
 # CK_curvature(phi): K = -d_u( phi_x + phi phi_u ).
-# When d_u K = 0 but simplify keeps a spurious dependence on u, the u -> 0
-# reduction is applied (the Python package does the same in
-# simplification.rational_curvature).  A curvature that genuinely depends on
-# u is returned unchanged, so that has(K,u) detects it.
+# Normalisations tried, in order: simplify, radnormal, evala(Normal), and
+# finally the u -> 0 reduction (accepted only after a numerical test of
+# u-independence).  A curvature that genuinely depends on u is returned
+# unchanged, so that has(K,u) detects it.
 CK_curvature := proc(phi)
     local K, cand;
-    K := simplify(-diff(diff(phi, x) + phi*diff(phi, u), u)):
+    K := simplify(-diff(CK_divergence(phi), u)):
     if not has(K, u) then return K end if:
+    try
+        cand := radnormal(K):
+        if not has(cand, u) then return cand end if:
+    catch:
+    end try:
+    try
+        cand := evala(Normal(K)):
+        if not has(cand, u) then return cand end if:
+    catch:
+    end try:
     if not CK_is_u_free(K) then return K end if:
     cand := simplify(subs(u = 0, K)):
     if has(cand, u) then return K end if:
@@ -169,7 +195,7 @@ end proc:
 
 # CK_c(phi, kappa): c(x) = A(phi) + kappa u.
 CK_c := proc(phi, kappa)
-    return simplify(diff(phi, x) + phi*diff(phi, u) + kappa*u):
+    return simplify(CK_divergence(phi) + kappa*u):
 end proc:
 
 ##############################################################################

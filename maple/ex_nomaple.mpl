@@ -2,19 +2,29 @@
 # ex_nomaple.mpl -- paper example ex:nomaple
 #
 #   The algebraic ODE used in the paper as the benchmark on which Maple's
-#   dsolve returns NULL.  The right-hand side is written as
+#   dsolve returns NULL.  The right-hand side is used exactly as printed,
+#   with its nested radicals:
 #
-#       phi = 9 x S^2 - u/x,
+#       R = ( (x u + 3 x^3 - 2 x^9
+#              + sqrt(x^2 u^2 + 2 x^4 (3 - 2 x^6) u + 4 - 3 x^6)) / 2 )^(1/3)
+#       S = R + (x^6 - 1)/R - x^3
+#       u' = 9 x S^2 - u/x,        D = {0 < x < 1, u > 0}.
 #
-#   where S is the algebraic element defined by
+#   The algebraic element is deliberately NOT replaced by a RootOf: that
+#   rewrites the example into a different and much easier problem (on the
+#   RootOf presentation Maple's dsolve returns the general solution in
+#   0.1 seconds, whereas on this input it does not return at all), which
+#   would make the comparison recorded in the paper meaningless.
 #
-#       S^3 + 3 x^3 S^2 + 3 S - x u = 0.
+#   The curvature is nevertheless cheap: A(phi) = phi_x + phi phi_u
+#   simplifies to 2u/x^2 before the u-derivative is taken, whence
+#   kappa = -2/x^2 and c = 0.  With delta = 1/x,
 #
-#   Using RootOf for S lets Maple differentiate phi through the implicit
-#   function theorem (the Python package uses a custom Function for the same
-#   purpose).  The curvature is kappa = -2/x^2, c = 0, and the paper's
-#   family is  u = 3 s^2 x^2 + (s^3 + 3 s)/x,  which corresponds to the
-#   branch S = s.
+#       I = -9 S^2,     f(x;s) = 3 s^2 x^2 + (s^3 + 3 s)/x,   s > 0.
+#
+#   The raw output of the algorithm is written in the nested radicals and is
+#   too long to be informative, so only its size is reported; the closed
+#   forms printed in the paper are verified instead.
 #
 # Run from this directory:  maple -q < ex_nomaple.mpl
 ##############################################################################
@@ -22,34 +32,52 @@
 restart:
 read "curvature_kovacic.mpl":
 
-S := RootOf(_Z^3 + 3*x^3*_Z^2 + 3*_Z - x*u, _Z):
+R := ((x*u + 3*x^3 - 2*x^9
+        + sqrt(x^2*u^2 + 2*x^4*(3 - 2*x^6)*u + 4 - 3*x^6))/2)^(1/3):
+S := R + (x^6 - 1)/R - x^3:
 phi := 9*x*S^2 - u/x:
 x0 := 1/2: v0 := 1:
 
-printf("=== A3: alg:kovacic on the algebraic ODE ===\n"):
+printf("=== A(phi), curvature and coefficient, with the explicit radicals ===\n"):
+printf("  A(phi) = %a\n", CK_divergence(phi)):
+printf("  kappa  = %a\n", CK_curvature(phi)):
+printf("  c      = %a\n", CK_c(phi, CK_curvature(phi))):
+
+printf("\n=== A3: alg:kovacic on the printed input ===\n"):
 out := CK_alg_kovacic(phi, x0, v0):
-CK_show(out):
-CK_check(out, phi, x0, v0, [1, 3/2]):
+printf("  status = %a   (%a)\n", out["status"], out["message"]):
+printf("  delta  = %a\n", out["delta"]):
+if out["status"] = "ok" then
+    printf("  raw output (nested radicals): S = %a chars, I = %a chars, family = %a chars\n",
+        length(out["S"]), length(out["I"]), length(out["family"])):
+end if:
+CK_check(out, phi, x0, v0, [1/4, 3/4]):
 
-printf("\n=== the family printed in the paper ===\n"):
-fpaper := 3*s^2*x^2 + (s^3+3*s)/x:
-CK_report("3s^2x^2+(s^3+3s)/x solves the ODE on the branch S = s",
-    CK_zero(subs({S = s, u = fpaper}, diff(fpaper, x) - phi))):
-CK_report("the branch S = s corresponds to that family",
-    CK_zero(subs({S = s, u = fpaper}, S^3 + 3*x^3*S^2 + 3*S - x*u))):
-CK_report("the first integral equals -9 s^2 on the branch S = s",
-    CK_zero(subs(S = s, out["I"]) + 9*s^2)):
+printf("\n=== closed forms printed in the paper ===\n"):
+printf("  I      = -9 S^2\n"):
+CK_report("I = -9 S^2", CK_zero(out["I"] + 9*S^2)):
 
-# The parameter of Algorithm 1 is v = u(x0); on the branch S = s, u(x0) is
-# given by fpaper(x0), so the two families have to coincide at every x.
+# The paper's family, on the domain 0 < x < 1.
+printf("  family = 3 s^2 x^2 + (s^3 + 3 s)/x\n"):
+fpaper := 3*s^2*x^2 + (s^3 + 3*s)/x:
+okp := true:
+for sv in [1, 2, 3/2] do
+    for xv in [1/4, 3/4] do
+        uv := subs({s = sv, x = xv}, fpaper):
+        okp := okp and abs(evalf(subs({x = xv, u = uv, s = sv}, diff(fpaper, x) - phi), 20)) < 1e-10:
+    end do:
+end do:
+CK_report("3 s^2 x^2 + (s^3 + 3 s)/x solves the ODE", okp):
+
+# v = u(x0) on the paper's family; the two families must then coincide.
 v_of_s := subs(x = x0, fpaper):
 fam_s := subs(v = v_of_s, out["family"]):
 okp := true:
-for sv in [1, 2] do
-    for xv in [1, 3/2] do
+for sv in [1, 2, 3/2] do
+    for xv in [1/4, 3/4] do
         okp := okp and abs(evalf(subs({s = sv, x = xv}, fam_s - fpaper), 20)) < 1e-10:
     end do:
 end do:
-CK_report("Algorithm 1 family = paper family for s = 1, 2", okp):
+CK_report("Algorithm 1 family = paper family 3 s^2 x^2 + (s^3+3s)/x", okp):
 
 NULL:

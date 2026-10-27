@@ -11,7 +11,7 @@ Maple counterpart of the constructive integration algorithms of the paper
 | `ex_galois_positive.mpl` | `ex:galois_positive`, Kovacic's Example 1 of §4.2 |
 | `ex_airy_obstruction.mpl` | `ex:airy_obstruction`: Algorithm 1 integrates, Algorithm 3 must report the obstruction |
 | `ex_particular_solution.mpl` | `alg:particular` on an affine Euler–Cauchy equation |
-| `ex_nomaple.mpl` | `ex:nomaple`, the algebraic equation on which Maple's `dsolve` returns NULL |
+| `ex_nomaple.mpl` | `ex:nomaple`, the algebraic equation on which Maple's `dsolve` returns NULL, with its nested radicals exactly as printed |
 | `ex_kovacic_solver.mpl` | diagnostics for `DEtools[kovacicsols]` itself |
 | `ex_diagnostics.mpl` | the rejection branches: outside the class, invalid auxiliary or particular solution, non-rational curvature, obstruction |
 | `run_all.sh` | runs every example in turn |
@@ -23,7 +23,7 @@ Only the Maple standard library is used; Kovacic's algorithm is taken from
 `DEtools[kovacicsols]`. No package needs to be installed.
 
 The scripts were tested with **Maple 2015.0** (X86 64 LINUX, Build ID
-1022128). `transcript.txt` is the recorded output: 121 checks, all passing,
+1022128). `transcript.txt` is the recorded output: 120 checks, all passing,
 including the identity $dI=S_\delta\,(du-\phi\,dx)$, $L(\delta)=0$, the
 initial conditions of the family, the ODE along the family, the
 constancy of $I$ along the family and $L(u_p)=c$.
@@ -107,11 +107,17 @@ non-integrability theorem.
   any candidate carrying a non-Liouvillian head, checks that each remaining
   candidate solves $L(\delta)=0$, and reports `solver_limited` if nothing
   survives. The solver call is wrapped in `timelimit(120, ...)`.
-* **`ex_nomaple`.** The algebraic element is introduced as
-  `RootOf(_Z^3+3*x^3*_Z^2+3*_Z-x*u, _Z)`, so that `diff` applies the
-  implicit function theorem; the paper's family
-  $3s^2x^2+(s^3+3s)/x$ is then verified on the branch $S=s$. The Python
-  package does the same thing with a custom `Function`.
+* **`ex_nomaple`.** The nested radicals are used exactly as printed; the
+  algebraic element is *not* replaced by a `RootOf`. That replacement would
+  turn the example into a different and much easier problem: on the `RootOf`
+  presentation Maple's `dsolve` returns the general solution in about 0.1 s,
+  whereas on the printed input it does not return at all, so the benchmark
+  recorded in the paper would be lost. What makes the printed input
+  tractable here is the order of operations in `CK_curvature`: $A(\phi)$ is
+  simplified first (it becomes $2u/x^2$), and only then differentiated in
+  $u$; `radnormal` and `evala(Normal(...))` handle the residual radicals.
+  The closed forms $I=-9S^2$ and $3s^2x^2+(s^3+3s)/x$ are then verified
+  against the raw output.
 * **Normalization.** Different choices of the linear solution $\delta$ give
   different normalizations of $I$ and $S$, and different bases of the
   solution space in Algorithm 3. The implicit solution is therefore defined

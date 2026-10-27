@@ -81,7 +81,7 @@ The paper-oriented aliases `integrate_from_linear_solution`,
 | `examples/ex_particular_solution.py` | `alg:particular` on an affine Euler--Cauchy equation |
 | `examples/ex_circle.py` | Circle equation `u' = sqrt(1-u^2)/2` (`ex:nonlinear_proj`, equation `eq:example_sqrt`) |
 | `examples/ex_airy_obstruction.py` | Airy obstruction (`ex:airy_obstruction`) |
-| `examples/ex_nomaple.py` | Algorithm 3 on the algebraic radical equation (`ex:nomaple`) |
+| `examples/ex_nomaple.py` | Algorithm 3 on the algebraic radical equation (`ex:nomaple`), with the nested radicals exactly as printed; slow (~15 s) |
 
 Maple counterparts of the three integration algorithms and all examples are
 provided in [`maple/`](maple/). They implement the same diagnostics
@@ -90,7 +90,7 @@ provided in [`maple/`](maple/). They implement the same diagnostics
 `DEtools[kovacicsols]` for Kovacic's algorithm, and verify themselves with
 one `[pass]`/`[FAIL]` line per identity. They were tested with Maple 2015.0;
 `maple/transcript.txt` is the recorded output of `sh maple/run_all.sh`
-(121 checks, all passing). See `maple/README.md` for details.
+(120 checks, all passing). See `maple/README.md` for details.
 
 Run one with, for example,
 
@@ -170,6 +170,11 @@ theorem.
   lie in the domain of $\phi$, and membership of $(x,\tilde f(x))$ in the
   domain — which `alg:particular` step 2 asks to check — cannot be decided
   symbolically and remains the caller's responsibility.
+- `curvature` simplifies the divergence `A(phi) = phi_x + phi phi_u` first
+  and differentiates in `u` afterwards.  This is what makes the nested
+  radicals of `ex:nomaple` tractable; differentiating first produces an
+  expression SymPy cannot reduce.  The simplification is cached, since
+  `c_coefficient` needs the same divergence.
 - The symbolic simplification in `rational_curvature` and `refine_delta`
   are heuristics that help SymPy recognise a rational curvature and choose
   the branch adapted to $x>0$.  They are not part of the mathematical

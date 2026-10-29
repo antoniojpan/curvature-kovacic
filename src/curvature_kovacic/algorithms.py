@@ -71,7 +71,7 @@ def solve_from_linear_solution(phi: sp.Expr, delta: sp.Expr, x0: sp.Expr,
             message="d_u K != 0",
         )
 
-    kappa = K
+    kappa = rational_curvature(K, points)
     c = c_coefficient(phi, kappa)
 
     if safe_simplify(delta) == 0:
@@ -196,7 +196,7 @@ def solve_from_particular(phi: sp.Expr, f: sp.Expr, x0: sp.Expr,
             message="d_u K != 0",
         )
 
-    kappa = K
+    kappa = rational_curvature(K, points)
     c = c_coefficient(phi, kappa)
 
     if not is_zero(sp.diff(f, x) - phi.subs(u, f), points):
@@ -212,7 +212,7 @@ def solve_from_particular(phi: sp.Expr, f: sp.Expr, x0: sp.Expr,
 
     if not is_zero(sp.diff(delta_f, x, 2) + kappa * delta_f, points):
         return AlgorithmResult(
-            AlgorithmStatus.INVALID_DELTA_F,
+            AlgorithmStatus.INVALID_AUXILIARY_SOLUTION,
             kappa=kappa,
             c=c,
             delta=delta_f,

@@ -36,3 +36,4 @@ jobs:
           python examples/ex_circle.py
           python examples/ex_airy_obstruction.py
           python examples/ex_kovacic_solver.py
+          python examples/ex_nomaple.py

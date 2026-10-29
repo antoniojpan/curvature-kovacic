@@ -20,7 +20,6 @@ class AlgorithmStatus(str, Enum):
     OUTSIDE_CLASS = "outside_class"
     INVALID_AUXILIARY_SOLUTION = "invalid_auxiliary_solution"
     INVALID_PARTICULAR_SOLUTION = "invalid_particular_solution"
-    INVALID_DELTA_F = "invalid_delta_f"
     NOT_RATIONAL = "not_rational"
     OBSTRUCTION = "obstruction"
     SOLVER_LIMITED = "solver_limited"

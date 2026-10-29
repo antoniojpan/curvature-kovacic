@@ -1,7 +1,7 @@
 # Maple implementation
 
 Maple counterpart of the constructive integration algorithms of the paper
-(§8): `alg:delta`, `alg:particular` and `alg:kovacic`.
+(§7): `alg:delta`, `alg:particular` and `alg:kovacic`.
 
 | File | Content |
 |---|---|
@@ -111,11 +111,12 @@ non-integrability theorem.
   algebraic element is *not* replaced by a `RootOf`. That replacement would
   turn the example into a different and much easier problem: on the `RootOf`
   presentation Maple's `dsolve` returns the general solution in about 0.1 s,
-  whereas on the printed input it does not return at all, so the benchmark
-  recorded in the paper would be lost. What makes the printed input
-  tractable here is the order of operations in `CK_curvature`: $A(\phi)$ is
-  simplified first (it becomes $2u/x^2$), and only then differentiated in
-  $u$; `radnormal` and `evala(Normal(...))` handle the residual radicals.
+  whereas on the printed input it returns `NULL` (about 1.6 s on Maple
+  2015.0), so the benchmark recorded in the paper would be lost. What makes
+  the printed input tractable here is the order of operations in
+  `CK_curvature`: $A(\phi)$ is simplified first (it becomes $2u/x^2$), and
+  only then differentiated in $u$; `radnormal` and `evala(Normal(...))`
+  handle the residual radicals.
   The closed forms $I=-9S^2$ and $3s^2x^2+(s^3+3s)/x$ are then verified
   against the raw output.
 * **Normalization.** Different choices of the linear solution $\delta$ give

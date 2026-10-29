@@ -7,7 +7,7 @@
 #   "From curvature to Kovacic: a geometric approach to integrability of
 #    scalar ODEs",
 #
-# Section 8 (algorithms alg:delta, alg:particular, alg:kovacic).
+# Section 7 (algorithms alg:delta, alg:particular, alg:kovacic).
 #
 # Load with:  read "curvature_kovacic.mpl":
 #

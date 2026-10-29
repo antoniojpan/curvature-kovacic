@@ -55,7 +55,7 @@ delta = x ** sp.Rational(1, 4) * sp.exp(2 * sp.sqrt(x))
 result = solve_from_linear_solution(phi, delta, x0=1, v_value=3)
 
 print(result.status)    # ok
-print(result.kappa)     # 3/(16*x**2) - 1/x
+print(result.kappa)     # (3 - 16*x)/(16*x**2), i.e. 3/(16x^2) - 1/x
 print(result.c)         # 0
 print(result.I)         # first integral
 print(result.family)    # local family u(x;v)
@@ -104,7 +104,7 @@ identities used in the paper.
 
 ## Relation to the paper
 
-The three procedures follow §8 literally; three presentation choices are
+The three procedures follow §7 literally; three presentation choices are
 worth knowing when comparing printed output with the paper.
 
 **Family parameter.** The procedures return `u(x;v)` with `v = u(x0)`,
@@ -121,13 +121,14 @@ For the two instances where the paper uses `s`:
 rescales `I` and `S`; replacing `delta` by the independent solution changes
 `I` nonlinearly; and any nonconstant function of a first integral is again a
 first integral. In `ex:galois_positive` the paper prints the first integral
-attached to `delta = x^{1/4} exp(-2 sqrt(x))`, while `alg:delta` applied to
-the displayed `x^{1/4} exp(2 sqrt(x))` returns its reciprocal up to the
-factor 4 (`I_+ * I = 4`). `examples/ex_galois_positive.py` checks both
-statements. Likewise `examples/ex_euler_cauchy.py` uses `delta = x^2`,
-whereas the continuation of that example in the paper derives
-`delta = x^2 - x^{-1}` from the particular solution with `s = 1`; both are
-nonzero solutions of the same `L`, as the construction allows.
+attached to `delta_+ = x^{1/4} exp(2 sqrt(x))`, and `alg:delta` returns it
+exactly. With the independent solution `delta_- = x^{1/4} exp(-2 sqrt(x))`
+the algorithm returns `-I_-`, where `I_+ I_- = 4`;
+`examples/ex_galois_positive.py` checks both statements. Likewise
+`examples/ex_euler_cauchy.py` uses `delta = x^2`, whereas the continuation
+of that example in the paper derives `delta = x^2 - x^{-1}` from the
+particular solution with `s = 1`; both are nonzero solutions of the same
+`L`, as the construction allows.
 
 **Kovacic, step 4.** The implementation always takes the conservative
 branch: it returns the implicit solution and the family, but makes no claim
@@ -175,10 +176,11 @@ theorem.
   radicals of `ex:nomaple` tractable; differentiating first produces an
   expression SymPy cannot reduce.  The simplification is cached, since
   `c_coefficient` needs the same divergence.
-- The symbolic simplification in `rational_curvature` and `refine_delta`
-  are heuristics that help SymPy recognise a rational curvature and choose
-  the branch adapted to $x>0$.  They are not part of the mathematical
-  method and every accepted candidate is checked.
+- The symbolic simplifications in `rational_curvature` (applied to the
+  stored curvature in all three algorithms) and `refine_delta` are
+  heuristics that help SymPy recognise a rational curvature and choose the
+  branch adapted to $x>0$.  They are not part of the mathematical method
+  and every accepted candidate is checked.
 - The Kovacic solver implements Cases 1--3.  Its polynomial systems are
   solved with SymPy; when SymPy cannot complete a subproblem the result is
   `SOLVER_LIMITED`, not an obstruction.

@@ -3,7 +3,7 @@ message: "If you use this software, please cite it as below."
 type: software
 title: "curvature-kovacic: constructive integration of scalar ODEs via Kovacic's algorithm"
 version: 1.0.0
-date-released: 2026-10-25
+date-released: 2026-10-29
 license: MIT
 authors:
   - family-names: "Pan-Collantes"

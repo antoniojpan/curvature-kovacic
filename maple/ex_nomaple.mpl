@@ -13,8 +13,9 @@
 #   The algebraic element is deliberately NOT replaced by a RootOf: that
 #   rewrites the example into a different and much easier problem (on the
 #   RootOf presentation Maple's dsolve returns the general solution in
-#   0.1 seconds, whereas on this input it does not return at all), which
-#   would make the comparison recorded in the paper meaningless.
+#   0.1 seconds, whereas on this input it returns NULL in about 1.6
+#   seconds on Maple 2015.0), which would make the comparison recorded in
+#   the paper meaningless.
 #
 #   The curvature is nevertheless cheap: A(phi) = phi_x + phi phi_u
 #   simplifies to 2u/x^2 before the u-derivative is taken, whence

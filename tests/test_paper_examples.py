@@ -20,9 +20,15 @@ from conftest import assert_zero
 PHI_GALOIS = u / (4 * x) + sp.sqrt(u**2 - 4 * sp.sqrt(x)) / sp.sqrt(x)
 KAPPA_GALOIS = sp.Rational(3, 16) / x**2 - 1 / x
 DELTA_GALOIS = x ** sp.Rational(1, 4) * sp.exp(2 * sp.sqrt(x))
-I_GALOIS = (
-    sp.Rational(1, 2)
-    * x ** sp.Rational(-1, 4)
+# First integral printed in the paper, attached to delta_+.
+I_GALOIS_PLUS = (
+    x ** sp.Rational(-1, 4)
+    * sp.exp(2 * sp.sqrt(x))
+    * (u - sp.sqrt(u**2 - 4 * sp.sqrt(x)))
+)
+# Independent-solution counterpart; I_+ * I_- = 4.
+I_GALOIS_MINUS = (
+    x ** sp.Rational(-1, 4)
     * sp.exp(-2 * sp.sqrt(x))
     * (u + sp.sqrt(u**2 - 4 * sp.sqrt(x)))
 )
@@ -45,14 +51,19 @@ def test_galois_positive_printed_I_and_family():
     assert result.status == "ok", result.message
     pts = points_from_family(result.family, [sp.Rational(3, 2), 2], 3)
 
-    # alg:delta with delta_+ returns 2 / I_paper.
-    assert_zero(result.I * I_GALOIS - 2, pts)
+    # alg:delta with delta_+ returns exactly the printed I_+.
+    assert_zero(result.I - I_GALOIS_PLUS, pts)
+    # The independent solution gives I_-, with I_+ I_- = 4.
+    assert_zero(result.I * I_GALOIS_MINUS - 4, pts)
     assert_zero(
         sp.simplify(result.family - F_GALOIS),
         [{x: sp.Rational(3, 2), v: 3}, {x: 2, v: 3}],
     )
-    # The printed I is itself a first integral.
-    assert_zero(sp.diff(I_GALOIS, x) + sp.diff(I_GALOIS, u) * PHI_GALOIS, pts)
+    # The printed I_+ is itself a first integral.
+    assert_zero(
+        sp.diff(I_GALOIS_PLUS, x) + sp.diff(I_GALOIS_PLUS, u) * PHI_GALOIS,
+        pts,
+    )
 
 
 def test_galois_positive_kovacic_is_case_two():
@@ -71,8 +82,8 @@ def test_galois_positive_algorithm_3():
 
     pts = points_from_family(result.family, [sp.Rational(3, 2), 2], 3)
     # The solver's branch is delta_- = x^{1/4} e^{-2 sqrt(x)},
-    # hence alg:delta returns -2 I_paper.
-    assert_zero(result.I + 2 * I_GALOIS, pts)
+    # hence alg:delta returns -I_-.
+    assert_zero(result.I + I_GALOIS_MINUS, pts)
     assert_zero(
         sp.simplify(result.family - F_GALOIS),
         [{x: sp.Rational(3, 2), v: 3}, {x: 2, v: 3}],

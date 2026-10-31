@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "curvature-kovacic"
-version = "1.0.0"
+version = "1.0.1"
 description = "Constructive integration of scalar ODEs with x-dependent Gauss curvature via Kovacic's algorithm"
 readme = "README.md"
 requires-python = ">=3.10"

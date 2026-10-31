@@ -59,4 +59,6 @@ def check_particular_result(result, phi, f, kappa, c, x0, v0, x_values,
     pts = points_from_family(result.family, x_values, v0)
     assert_zero(sp.diff(result.delta, x, 2) + result.kappa * result.delta,
                 pts, tol)
+    assert_zero(sp.diff(result.delta2, x, 2) + result.kappa * result.delta2,
+                pts, tol)
     assert_zero(result.delta.subs(x, x0) - 1, [{x: x0}], tol)

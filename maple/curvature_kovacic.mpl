@@ -298,7 +298,7 @@ CK_alg_particular := proc(phi, f, x0, v0)
     # (3) linear solution from the divergence along f
     phi_u := diff(phi, u):
     delta_f := simplify(exp(CK_int(subs(u = f, phi_u), x0, x))):
-    delta_f2 := simplify(CK_int(1/delta_f^2, x0, x)):
+    delta_f2 := simplify(delta_f*CK_int(1/delta_f^2, x0, x)):
     if not CK_zero(diff(delta_f, x, x) + kappa*delta_f) then
         return table(["status" = "invalid_auxiliary_solution",
             "kappa" = kappa, "c" = cc, "delta" = delta_f,
@@ -438,6 +438,12 @@ CK_check := proc(out, phi, x0, v0, xpts)
     ok := CK_report("dI/dx + S*phi = 0", CK_zero(diff(F, x) + S*phi)) and ok:
     ok := CK_report("L(delta) = 0",
         CK_zero(diff(out["delta"], x, x) + out["kappa"]*out["delta"])) and ok:
+    for kk in ["delta2", "delta_f2"] do
+        if has([indices(out, nolist)], kk) then
+            ok := CK_report(sprintf("L(%s) = 0", kk),
+                CK_zero(diff(out[kk], x, x) + out["kappa"]*out[kk])) and ok:
+        end if:
+    end do:
 
     # explicit family: initial conditions and the ODE itself
     Fx := out["family"]:

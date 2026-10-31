@@ -10,7 +10,7 @@ Maple counterpart of the constructive integration algorithms of the paper
 | `ex_euler_cauchy.mpl` | `ex:euler_cauchy`, $\kappa=-2/x^2$ |
 | `ex_galois_positive.mpl` | `ex:galois_positive`, Kovacic's Example 1 of §4.2 |
 | `ex_airy_obstruction.mpl` | `ex:airy_obstruction`: Algorithm 1 integrates, Algorithm 3 must report the obstruction |
-| `ex_particular_solution.mpl` | `alg:particular` on an affine Euler–Cauchy equation |
+| `ex_particular_solution.mpl` | `alg:particular` on an affine Euler–Cauchy equation and on a nonlinear member of the class (general branch, where $\delta_{f2}$ enters) |
 | `ex_nomaple.mpl` | `ex:nomaple`, the algebraic equation on which Maple's `dsolve` returns NULL, with its nested radicals exactly as printed |
 | `ex_kovacic_solver.mpl` | diagnostics for `DEtools[kovacicsols]` itself |
 | `ex_diagnostics.mpl` | the rejection branches: outside the class, invalid auxiliary or particular solution, non-rational curvature, obstruction |
@@ -23,8 +23,9 @@ Only the Maple standard library is used; Kovacic's algorithm is taken from
 `DEtools[kovacicsols]`. No package needs to be installed.
 
 The scripts were tested with **Maple 2015.0** (X86 64 LINUX, Build ID
-1022128). `transcript.txt` is the recorded output: 120 checks, all passing,
-including the identity $dI=S_\delta\,(du-\phi\,dx)$, $L(\delta)=0$, the
+1022128). `transcript.txt` is the recorded output: 141 checks, all passing,
+including the identity $dI=S_\delta\,(du-\phi\,dx)$,
+$L(\delta)=L(\delta_2)=L(\delta_{f2})=0$, the
 initial conditions of the family, the ODE along the family, the
 constancy of $I$ along the family and $L(u_p)=c$.
 

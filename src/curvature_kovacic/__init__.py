@@ -37,7 +37,7 @@ from .kovacic import KovacicResult, KovacicSolver, KovacicStatus
 from .results import AlgorithmResult, AlgorithmStatus
 from .simplification import rational_curvature, refine_delta
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 #: Paper-oriented aliases.
 integrate_from_linear_solution = solve_from_linear_solution

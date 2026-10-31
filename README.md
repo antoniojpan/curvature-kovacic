@@ -90,7 +90,7 @@ provided in [`maple/`](maple/). They implement the same diagnostics
 `DEtools[kovacicsols]` for Kovacic's algorithm, and verify themselves with
 one `[pass]`/`[FAIL]` line per identity. They were tested with Maple 2015.0;
 `maple/transcript.txt` is the recorded output of `sh maple/run_all.sh`
-(120 checks, all passing). See `maple/README.md` for details.
+(141 checks, all passing). See `maple/README.md` for details.
 
 Run one with, for example,
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Kovacic's Example 1, Section 4.2 (``ex:galois_positive``).
+"""Example 6.3 of the paper (``ex:galois_positive``), which is Kovacic's
+Example 1, Section 4.2.
 
 Equation:
 

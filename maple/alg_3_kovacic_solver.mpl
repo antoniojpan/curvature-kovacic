@@ -1,12 +1,13 @@
 ##############################################################################
-# ex_kovacic_solver.mpl -- diagnostics for DEtools[kovacicsols] itself
+# alg_3_kovacic_solver.mpl -- diagnostics for DEtools[kovacicsols] itself,
+# the solver used by Algorithm 7.3 (alg:kovacic)
 #
 #   This script does not use the nonlinear algorithms: it only records what
 #   Maple's Kovacic implementation returns for the inputs used in the paper
 #   and in the Python diagnostics, and checks that every candidate really
 #   solves  y'' + kappa y = 0.
 #
-# Run from this directory:  maple -q < ex_kovacic_solver.mpl
+# Run from this directory:  maple -q < alg_3_kovacic_solver.mpl
 ##############################################################################
 
 restart:
@@ -20,7 +21,7 @@ examples := [
     ["Euler-Cauchy",                  -2/x^2,                    "solved"],
     ["Kovacic Example 1",              3/(16*x^2) - 1/x,         "solved"],
     ["Case 2",                        (3 + 8*x)/(16*x^2),        "solved"],
-    ["Case 3",                        (x - 4)/(4*x*(x - 1)^2),   "solved"],
+    ["Case 1",                        (x - 4)/(4*x*(x - 1)^2),   "solved"],
     ["Airy obstruction",               x,                        "obstruction"],
     ["Bessel nu = 1",                  1 - 3/(4*x^2),            "obstruction"]
 ]:

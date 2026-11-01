@@ -74,14 +74,18 @@ The paper-oriented aliases `integrate_from_linear_solution`,
 
 ## Examples
 
-| Script | Content |
-|---|---|
-| `examples/ex_galois_positive.py` | Kovacic's Example 1, Section 4.2 (`ex:galois_positive`) |
-| `examples/ex_euler_cauchy.py` | Euler--Cauchy family (`ex:euler_cauchy`) |
-| `examples/ex_particular_solution.py` | `alg:particular` on an affine Euler--Cauchy equation |
-| `examples/ex_circle.py` | Circle equation `u' = sqrt(1-u^2)/2` (`ex:nonlinear_proj`, equation `eq:example_sqrt`) |
-| `examples/ex_airy_obstruction.py` | Airy obstruction (`ex:airy_obstruction`) |
-| `examples/ex_nomaple.py` | Algorithm 3 on the algebraic radical equation (`ex:nomaple`), with the nested radicals exactly as printed; slow (~15 s) |
+The paper's examples are numbered as in the resubmission, and the script
+names carry that number:
+
+| Script | Paper | Content |
+|---|---|---|
+| `examples/ex_3_4_euler_cauchy.py` | Example 3.4 (`ex:euler_cauchy`) | Euler--Cauchy family $u'=\frac{u}{2x}+\frac{3}{2x}\sqrt{u^2-4x}$ |
+| `examples/ex_5_6_circle.py` | Example 5.6 (`ex:nonlinear_proj`) | Circle equation `u' = sqrt(1-u^2)/2` (equation `eq:example_sqrt`) |
+| `examples/ex_6_3_galois_positive.py` | Example 6.3 (`ex:galois_positive`) | Kovacic's Example 1, Section 4.2 |
+| `examples/ex_6_5_airy_obstruction.py` | Example 6.5 (`ex:airy_obstruction`) | Airy obstruction |
+| `examples/ex_6_7_nomaple.py` | Example 6.7 (`ex:nomaple`) | Algorithm 3 on the algebraic radical equation, with the nested radicals exactly as printed; slow (~15 s) |
+| `examples/alg_2_particular_solution.py` | Algorithm 7.2 (`alg:particular`) | Affine Euler--Cauchy example, not from the paper |
+| `examples/alg_3_kovacic_solver.py` | Algorithm 7.3 (`alg:kovacic`) | Diagnostics for the self-contained Kovacic solver, not from the paper |
 
 Maple counterparts of the three integration algorithms and all examples are
 provided in [`maple/`](maple/). They implement the same diagnostics
@@ -95,7 +99,7 @@ one `[pass]`/`[FAIL]` line per identity. They were tested with Maple 2015.0;
 Run one with, for example,
 
 ```bash
-python examples/ex_galois_positive.py
+python examples/ex_6_3_galois_positive.py
 ```
 
 Each script prints the curvature, the coefficient $c$, the auxiliary
@@ -111,21 +115,21 @@ worth knowing when comparing printed output with the paper.
 whereas the examples in the paper write `f(x;s)` with their own parameter.
 For the two instances where the paper uses `s`:
 
-- `ex:euler_cauchy`: the paper's `f(x;s) = s x^2 + s^{-1} x^{-1}` and the
+- Example 3.4: the paper's `f(x;s) = s x^2 + s^{-1} x^{-1}` and the
   returned family coincide for `s = (v + sqrt(v^2 - 8))/8` at `x0 = 2`
-  (checked in `examples/ex_euler_cauchy.py`);
-- `ex:galois_positive`: they coincide for
+  (checked in `examples/ex_3_4_euler_cauchy.py`);
+- Example 6.3: they coincide for
   `s = exp(-2)(v + sqrt(v^2 - 4))/2` at `x0 = 1`.
 
 **First integrals are not unique.** Multiplying `delta` by a constant
 rescales `I` and `S`; replacing `delta` by the independent solution changes
 `I` nonlinearly; and any nonconstant function of a first integral is again a
-first integral. In `ex:galois_positive` the paper prints the first integral
+first integral. In Example 6.3 the paper prints the first integral
 attached to `delta_+ = x^{1/4} exp(2 sqrt(x))`, and `alg:delta` returns it
 exactly. With the independent solution `delta_- = x^{1/4} exp(-2 sqrt(x))`
 the algorithm returns `-I_-`, where `I_+ I_- = 4`;
-`examples/ex_galois_positive.py` checks both statements. Likewise
-`examples/ex_euler_cauchy.py` uses `delta = x^2`, whereas the continuation
+`examples/ex_6_3_galois_positive.py` checks both statements. Likewise
+`examples/ex_3_4_euler_cauchy.py` uses `delta = x^2`, whereas the continuation
 of that example in the paper derives `delta = x^2 - x^{-1}` from the
 particular solution with `s = 1`; both are nonzero solutions of the same
 `L`, as the construction allows.
@@ -173,7 +177,7 @@ theorem.
   symbolically and remains the caller's responsibility.
 - `curvature` simplifies the divergence `A(phi) = phi_x + phi phi_u` first
   and differentiates in `u` afterwards.  This is what makes the nested
-  radicals of `ex:nomaple` tractable; differentiating first produces an
+  radicals of Example 6.7 tractable; differentiating first produces an
   expression SymPy cannot reduce.  The simplification is cached, since
   `c_coefficient` needs the same divergence.
 - The symbolic simplifications in `rational_curvature` (applied to the

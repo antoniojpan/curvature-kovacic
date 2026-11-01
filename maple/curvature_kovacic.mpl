@@ -43,9 +43,13 @@
 
 x := 'x': u := 'u': v := 'v': t := 't':
 
-# Try to disable Kovacic's "pullback" presentation (Maple 2018 and later
-# return hypergeometric answers for projective groups A4, S4, A5, which are
-# NOT Liouvillian).  In older versions this name is simply unused.
+# Disable Kovacic's "pullback" presentation.  On the versions that have it,
+# kovacicsols presents the A4, S4 and A5 answers as hypergeometric
+# expressions, which the filter below rejects because it cannot tell them
+# apart from the non-Liouvillian answers a solver may return for Case 4.
+# The setting is documented in ?DEtools[kovacicsols].  On Maple 2015 that
+# presentation does not exist and the assignment is inert; the try/catch only
+# guards against a future version protecting the name.
 try
     _Env_kovacicsols_pullback := false:
 catch:
@@ -56,16 +60,32 @@ CK_nonLiouvillian := [hypergeom, KummerM, KummerU, WhittakerM, WhittakerW,
     BesselJ, BesselY, BesselI, BesselK, AiryAi, AiryBi, HeunG, Heun, hankelh1,
     hankelh2, LaguerreL, LegendreP, ChebyshevT, ChebyshevU, JacobiP]:
 
-# Sample points used by the numerical zero test.
+# Default sample points used by the numerical zero test.
+#
+# CK_zero simplifies symbolically first and evaluates numerically only as a
+# last resort.  The default set below is meant for equations with no
+# prescribed domain; an example whose domain excludes these points must pass
+# its own, as an optional last argument:
+#
+#     CK_alg_delta(phi, delta, x0, v0, points)
+#     CK_alg_particular(phi, f, x0, v0, points)
+#     CK_alg_kovacic(phi, x0, v0, points)
+#     CK_check(out, phi, x0, v0, xpts, points)
+#     CK_zero(e, points)
+#
+# The points must lie where the equation and its solutions are real; outside
+# such a domain Maple evaluates a complex branch and the numerical test is
+# meaningless.  This mirrors the `points` argument of the Python package.
 CK_sample := [{x = 2, u = 3/2}, {x = 3/2, u = 6/5}, {x = 5/2, u = 7/3}]:
 
 ##############################################################################
 # Helpers
 ##############################################################################
 
-# CK_zero(e): true when e is identically zero.  Symbolic attempts first;
-# as a last resort the expression is evaluated numerically at CK_sample.
-CK_zero := proc(e)
+# CK_zero(e, points): true when e is identically zero.  Symbolic attempts
+# first; as a last resort the expression is evaluated numerically at points,
+# which must lie where e is defined (by default CK_sample).
+CK_zero := proc(e, points := CK_sample)
     local s, p, val, ok;
     if e = 0 then return true end if:
     s := simplify(e):
@@ -76,7 +96,7 @@ CK_zero := proc(e)
     catch:
     end try:
     ok := true:
-    for p in CK_sample do
+    for p in points do
         try
             val := evalf(subs(p, s), 20):
             if not type(val, numeric) or abs(val) > 1e-10 then
@@ -86,7 +106,7 @@ CK_zero := proc(e)
             ok := false: break:
         end try:
     end do:
-    return ok and CK_sample <> [];
+    return ok and points <> [];
 end proc:
 
 # CK_report(name, cond): print one verification line and return cond.
@@ -202,7 +222,7 @@ end proc:
 # Algorithm 1 (alg:delta)
 ##############################################################################
 
-CK_alg_delta := proc(phi, delta, x0, v0)
+CK_alg_delta := proc(phi, delta, x0, v0, points := CK_sample)
     local kappa, cc, S, Q, delta2, S2, Q2, F1, F2, up, fam, Sreg, Freg,
         beta, deg, Fdeg, famdeg;
 
@@ -220,12 +240,12 @@ CK_alg_delta := proc(phi, delta, x0, v0)
             "kappa" = kappa, "c" = cc, "delta" = delta,
             "message" = "delta is identically zero"]):
     end if:
-    if not CK_zero(diff(delta, x, x) + kappa*delta) then
+    if not CK_zero(diff(delta, x, x) + kappa*delta, points) then
         return table(["status" = "invalid_auxiliary_solution",
             "kappa" = kappa, "c" = cc, "delta" = delta,
             "message" = "L(delta) is not zero"]):
     end if:
-    if CK_zero(subs(x = x0, delta)) then
+    if CK_zero(subs(x = x0, delta), points) then
         return table(["status" = "invalid_auxiliary_solution",
             "kappa" = kappa, "c" = cc, "delta" = delta,
             "message" = "delta(x0) = 0: choose another base point"]):
@@ -233,9 +253,9 @@ CK_alg_delta := proc(phi, delta, x0, v0)
 
     # (3) multiplier; the degenerate case S = 0 means phi is affine in u
     S := simplify(diff(delta, x) - diff(phi, u)*delta):
-    if CK_zero(S) then
+    if CK_zero(S, points) then
         beta := simplify(phi - (diff(delta, x)/delta)*u):
-        if not CK_zero(diff(beta, u)) then
+        if not CK_zero(diff(beta, u), points) then
             return table(["status" = "invalid_auxiliary_solution",
                 "kappa" = kappa, "c" = cc, "delta" = delta, "S" = S,
                 "message" = "S = 0 but phi is not affine in u"]):
@@ -261,7 +281,7 @@ CK_alg_delta := proc(phi, delta, x0, v0)
             - subs(x = x0, diff(delta, x))*v)*delta2):
 
     # (5) if S vanishes at the base point, use the independent solution
-    if CK_zero(subs(u = v0, subs(x = x0, S))) then
+    if CK_zero(subs(u = v0, subs(x = x0, S)), points) then
         Sreg := S2: Freg := F2:
     else
         Sreg := S: Freg := F1:
@@ -277,7 +297,7 @@ end proc:
 # Algorithm 2 (alg:particular)
 ##############################################################################
 
-CK_alg_particular := proc(phi, f, x0, v0)
+CK_alg_particular := proc(phi, f, x0, v0, points := CK_sample)
     local kappa, cc, phi_u, delta_f, delta_f2, out, fam, f0, fu0, pu0;
 
     # (1) curvature and class check
@@ -289,7 +309,7 @@ CK_alg_particular := proc(phi, f, x0, v0)
     cc := CK_c(phi, kappa):
 
     # (2) validate the particular solution
-    if not CK_zero(diff(f, x) - subs(u = f, phi)) then
+    if not CK_zero(diff(f, x) - subs(u = f, phi), points) then
         return table(["status" = "invalid_particular_solution",
             "kappa" = kappa, "c" = cc,
             "message" = "f' is not phi(x,f)"]):
@@ -299,14 +319,14 @@ CK_alg_particular := proc(phi, f, x0, v0)
     phi_u := diff(phi, u):
     delta_f := simplify(exp(CK_int(subs(u = f, phi_u), x0, x))):
     delta_f2 := simplify(delta_f*CK_int(1/delta_f^2, x0, x)):
-    if not CK_zero(diff(delta_f, x, x) + kappa*delta_f) then
+    if not CK_zero(diff(delta_f, x, x) + kappa*delta_f, points) then
         return table(["status" = "invalid_auxiliary_solution",
             "kappa" = kappa, "c" = cc, "delta" = delta_f,
             "message" = "L(delta_f) is not zero"]):
     end if:
 
     # (4) implicit solution from Algorithm 1
-    out := CK_alg_delta(phi, delta_f, x0, v0):
+    out := CK_alg_delta(phi, delta_f, x0, v0, points):
     if out["status"] <> "ok" then
         return out:
     end if:
@@ -323,7 +343,7 @@ CK_alg_particular := proc(phi, f, x0, v0)
     out["delta_f2"] := delta_f2:
     out["family_alg1"] := out["family"]:
     out["family"] := fam:
-    out["family_matches"] := CK_zero(simplify(fam - out["family_alg1"])):
+    out["family_matches"] := CK_zero(simplify(fam - out["family_alg1"]), points):
     return out:
 end proc:
 
@@ -349,7 +369,7 @@ CK_kovacic_sols := proc(kappa)
     return sols:
 end proc:
 
-CK_alg_kovacic := proc(phi, x0, v0)
+CK_alg_kovacic := proc(phi, x0, v0, points := CK_sample)
     local kappa, cc, sols, cand, out, tried, nliv;
 
     # (1) curvature and class check
@@ -386,9 +406,9 @@ CK_alg_kovacic := proc(phi, x0, v0)
     for cand in sols do
         if has(cand, CK_nonLiouvillian) then next end if:
         nliv := nliv + 1:
-        if not CK_zero(diff(cand, x, x) + kappa*cand) then next end if:
+        if not CK_zero(diff(cand, x, x) + kappa*cand, points) then next end if:
         tried := [op(tried), cand]:
-        out := CK_alg_delta(phi, cand, x0, v0):
+        out := CK_alg_delta(phi, cand, x0, v0, points):
         if out["status"] = "ok" then
             out["message"] := "kovacic_success":
             return out:
@@ -415,9 +435,10 @@ end proc:
 # Verification of a result table
 ##############################################################################
 
-# CK_check(out, phi, x0, v0, xpts): check the identities used in the paper.
-# xpts is a list of x-values at which the family is tested numerically.
-CK_check := proc(out, phi, x0, v0, xpts)
+# CK_check(out, phi, x0, v0, xpts, points): check the identities used in the
+# paper.  xpts is a list of x-values at which the family is tested numerically;
+# points is the sample set of the numerical zero test (default CK_sample).
+CK_check := proc(out, phi, x0, v0, xpts, points := CK_sample)
     local ok, S, F, Fx, xv, uv, res, Ivals, ref, kk, st;
     ok := true:
 
@@ -434,22 +455,22 @@ CK_check := proc(out, phi, x0, v0, xpts)
     # multiplier and first integral: dI = S (du - phi dx)
     S := out["S"]:
     F := out["I"]:
-    ok := CK_report("dI/du = S", CK_zero(diff(F, u) - S)) and ok:
-    ok := CK_report("dI/dx + S*phi = 0", CK_zero(diff(F, x) + S*phi)) and ok:
+    ok := CK_report("dI/du = S", CK_zero(diff(F, u) - S, points)) and ok:
+    ok := CK_report("dI/dx + S*phi = 0", CK_zero(diff(F, x) + S*phi, points)) and ok:
     ok := CK_report("L(delta) = 0",
-        CK_zero(diff(out["delta"], x, x) + out["kappa"]*out["delta"])) and ok:
+        CK_zero(diff(out["delta"], x, x) + out["kappa"]*out["delta"], points)) and ok:
     for kk in ["delta2", "delta_f2"] do
         if has([indices(out, nolist)], kk) then
             ok := CK_report(sprintf("L(%s) = 0", kk),
-                CK_zero(diff(out[kk], x, x) + out["kappa"]*out[kk])) and ok:
+                CK_zero(diff(out[kk], x, x) + out["kappa"]*out[kk], points)) and ok:
         end if:
     end do:
 
     # explicit family: initial conditions and the ODE itself
     Fx := out["family"]:
-    ok := CK_report("family(x0) = v", CK_zero(subs(x = x0, Fx) - v)) and ok:
+    ok := CK_report("family(x0) = v", CK_zero(subs(x = x0, Fx) - v, points)) and ok:
     ok := CK_report("family'(x0) = phi(x0,v)",
-        CK_zero(subs(x = x0, diff(Fx, x)) - subs(u = v, subs(x = x0, phi)))) and ok:
+        CK_zero(subs(x = x0, diff(Fx, x)) - subs(u = v, subs(x = x0, phi)), points)) and ok:
     Ivals := []:
     for xv in xpts do
         uv := evalf(subs({x = xv, v = v0}, Fx), 25):
@@ -466,9 +487,9 @@ CK_check := proc(out, phi, x0, v0, xpts)
     if has([indices(out, nolist)], "u_p") then
         kk := out["u_p"]:
         ok := CK_report("L(u_p) = c",
-            CK_zero(diff(kk, x, x) + out["kappa"]*kk - out["c"])) and ok:
+            CK_zero(diff(kk, x, x) + out["kappa"]*kk - out["c"], points)) and ok:
         ok := CK_report("u_p(x0) = u_p'(x0) = 0",
-            CK_zero(subs(x = x0, kk)) and CK_zero(subs(x = x0, diff(kk, x)))) and ok:
+            CK_zero(subs(x = x0, kk), points) and CK_zero(subs(x = x0, diff(kk, x)), points)) and ok:
     end if:
 
     if has([indices(out, nolist)], "family_matches") then

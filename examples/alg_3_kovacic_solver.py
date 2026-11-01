@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Diagnostics for the self-contained Kovacic solver.
+"""Diagnostics for the self-contained Kovacic solver behind Algorithm 7.3.
 
 This script runs Cases 1--3 and reports the Case 4 obstruction on a few
 classical equations.  It is a quick way to inspect the solver independently
@@ -28,7 +28,7 @@ def main() -> None:
          sp.Rational(3, 16) / x**2 - 1 / x),
         ("Case 2, kappa = (3 + 8x)/(16x^2)",
          (3 + 8 * x) / (16 * x**2)),
-        ("Case 3, kappa = (x - 4)/(4x(x - 1)^2)",
+        ("Case 1, kappa = (x - 4)/(4x(x - 1)^2)",
          (x - 4) / (4 * x * (x - 1) ** 2)),
         ("Airy, kappa = x", x),
         ("Bessel nu=1, kappa = 1 - 3/(4x^2)",

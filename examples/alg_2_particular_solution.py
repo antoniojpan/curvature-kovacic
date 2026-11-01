@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""``alg:particular`` on an affine Euler--Cauchy equation.
+"""Algorithm 7.2 (``alg:particular``) on an affine Euler--Cauchy equation.
 
 Equation:
 

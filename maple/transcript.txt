@@ -2,122 +2,7 @@ Maple 2015.0, X86 64 LINUX, Feb 17 2015, Build ID 1022128
 
 
 ======================================================================
-ex_airy_obstruction.mpl
-======================================================================
-=== A1: alg:delta with delta = Ai(-x) ===
-  I              u/AiryAi(-x)
-  S              1/AiryAi(-x)
-  S_raw          0
-  beta           0
-  branch         "degenerate"
-  c              0
-  delta          AiryAi(-x)
-  family         AiryAi(-x)*v*3^(2/3)*GAMMA(2/3)
-  kappa          x
-  status         "ok"
-  [pass] dI/du = S
-  [pass] dI/dx + S*phi = 0
-  [pass] L(delta) = 0
-  [pass] family(x0) = v
-  [pass] family'(x0) = phi(x0,v)
-  [pass] family solves the ODE at x = 1
-  [pass] family solves the ODE at x = 2
-  [pass] I is constant along the family
-  ALL CHECKS PASSED
-
-=== A3: alg:kovacic (must report the obstruction) ===
-  c              0
-  kappa          x
-  message        "the nonlinear ODE has at most one Liouvillian solution over C(x)"
-  status         "obstruction"
-  [pass] status is an obstruction
-
-======================================================================
-ex_circle.mpl
-======================================================================
-=== A1: alg:delta with delta = cos(x/2) ===
-  I              -sin(1/2*x)*(-u^2+1)^(1/2)+u*cos(1/2*x)
-  I_alt          -sin(1/2*x)*(-u^2+1)^(1/2)+u*cos(1/2*x)
-  I_raw          -1/2*u*sin(1/2*x)-1/2*cos(1/2*x)*(-u^2+1)^(1/2)
-  Q              0
-  S              (u*sin(1/2*x)+cos(1/2*x)*(-u^2+1)^(1/2))/(-u^2+1)^(1/2)
-  S_alt          (u*sin(1/2*x)+cos(1/2*x)*(-u^2+1)^(1/2))/(-u^2+1)^(1/2)
-  S_raw          -1/2*(sin(1/2*x)*(-u^2+1)^(1/2)-u*cos(1/2*x))/(-u^2+1)^(1/2)
-  branch         "general"
-  c              0
-  delta          cos(1/2*x)
-  delta2         2*sin(1/2*x)
-  family         v*cos(1/2*x)+(-v^2+1)^(1/2)*sin(1/2*x)
-  kappa          1/4
-  status         "ok"
-  u_p            0
-  [pass] dI/du = S
-  [pass] dI/dx + S*phi = 0
-  [pass] L(delta) = 0
-  [pass] L(delta2) = 0
-  [pass] family(x0) = v
-  [pass] family'(x0) = phi(x0,v)
-  [pass] family solves the ODE at x = 1/2
-  [pass] family solves the ODE at x = 1
-  [pass] I is constant along the family
-  [pass] L(u_p) = c
-  [pass] u_p(x0) = u_p'(x0) = 0
-  ALL CHECKS PASSED
-
-=== A3: alg:kovacic ===
-  I              -sin(1/2*x)*(-u^2+1)^(1/2)+u*cos(1/2*x)
-  I_alt          -sin(1/2*x)*(-u^2+1)^(1/2)+u*cos(1/2*x)
-  I_raw          -1/2*u*sin(1/2*x)-1/2*cos(1/2*x)*(-u^2+1)^(1/2)
-  Q              0
-  S              (u*sin(1/2*x)+cos(1/2*x)*(-u^2+1)^(1/2))/(-u^2+1)^(1/2)
-  S_alt          (u*sin(1/2*x)+cos(1/2*x)*(-u^2+1)^(1/2))/(-u^2+1)^(1/2)
-  S_raw          -1/2*(sin(1/2*x)*(-u^2+1)^(1/2)-u*cos(1/2*x))/(-u^2+1)^(1/2)
-  branch         "general"
-  c              0
-  delta          cos(1/2*x)
-  delta2         2*sin(1/2*x)
-  family         v*cos(1/2*x)+(-v^2+1)^(1/2)*sin(1/2*x)
-  kappa          1/4
-  message        "kovacic_success"
-  status         "ok"
-  u_p            0
-  [pass] dI/du = S
-  [pass] dI/dx + S*phi = 0
-  [pass] L(delta) = 0
-  [pass] L(delta2) = 0
-  [pass] family(x0) = v
-  [pass] family'(x0) = phi(x0,v)
-  [pass] family solves the ODE at x = 1/2
-  [pass] family solves the ODE at x = 1
-  [pass] I is constant along the family
-  [pass] L(u_p) = c
-  [pass] u_p(x0) = u_p'(x0) = 0
-  ALL CHECKS PASSED
-
-======================================================================
-ex_diagnostics.mpl
-======================================================================
-=== outside the class: d_u K <> 0 ===
-alg:delta, phi = u^2                           -> outside_class                  [pass] as expected
-alg:particular, phi = u^2                      -> outside_class                  [pass] as expected
-alg:kovacic, phi = u^2                         -> outside_class                  [pass] as expected
-
-=== invalid auxiliary solution ===
-alg:delta, delta = sin(x) is not a solution    -> invalid_auxiliary_solution     [pass] as expected
-alg:delta, delta(x0) = 0                       -> invalid_auxiliary_solution     [pass] as expected
-alg:delta, delta = 0                           -> invalid_auxiliary_solution     [pass] as expected
-
-=== invalid particular solution ===
-alg:particular, f = x^3                        -> invalid_particular_solution    [pass] as expected
-
-=== curvature not rational: Kovacic does not apply ===
-alg:kovacic, kappa not in C(x)                 -> not_rational                   [pass] as expected
-
-=== obstruction (Maple 2015: kovacicsols is complete) ===
-alg:kovacic, Airy obstruction (kappa = x)      -> obstruction                    [pass] as expected
-
-======================================================================
-ex_euler_cauchy.mpl
+ex_3_4_euler_cauchy.mpl
 ======================================================================
 === A1: alg:delta with delta = x^2 ===
   I              -3/2*x*((u^2-4*x)^(1/2)-u)
@@ -179,7 +64,69 @@ ex_euler_cauchy.mpl
   ALL CHECKS PASSED
 
 ======================================================================
-ex_galois_positive.mpl
+ex_5_6_circle.mpl
+======================================================================
+=== A1: alg:delta with delta = cos(x/2) ===
+  I              -sin(1/2*x)*(-u^2+1)^(1/2)+u*cos(1/2*x)
+  I_alt          -sin(1/2*x)*(-u^2+1)^(1/2)+u*cos(1/2*x)
+  I_raw          -1/2*u*sin(1/2*x)-1/2*cos(1/2*x)*(-u^2+1)^(1/2)
+  Q              0
+  S              (u*sin(1/2*x)+cos(1/2*x)*(-u^2+1)^(1/2))/(-u^2+1)^(1/2)
+  S_alt          (u*sin(1/2*x)+cos(1/2*x)*(-u^2+1)^(1/2))/(-u^2+1)^(1/2)
+  S_raw          -1/2*(sin(1/2*x)*(-u^2+1)^(1/2)-u*cos(1/2*x))/(-u^2+1)^(1/2)
+  branch         "general"
+  c              0
+  delta          cos(1/2*x)
+  delta2         2*sin(1/2*x)
+  family         v*cos(1/2*x)+(-v^2+1)^(1/2)*sin(1/2*x)
+  kappa          1/4
+  status         "ok"
+  u_p            0
+  [pass] dI/du = S
+  [pass] dI/dx + S*phi = 0
+  [pass] L(delta) = 0
+  [pass] L(delta2) = 0
+  [pass] family(x0) = v
+  [pass] family'(x0) = phi(x0,v)
+  [pass] family solves the ODE at x = 1/2
+  [pass] family solves the ODE at x = 1
+  [pass] I is constant along the family
+  [pass] L(u_p) = c
+  [pass] u_p(x0) = u_p'(x0) = 0
+  ALL CHECKS PASSED
+
+=== A3: alg:kovacic ===
+  I              -sin(1/2*x)*(-u^2+1)^(1/2)+u*cos(1/2*x)
+  I_alt          -sin(1/2*x)*(-u^2+1)^(1/2)+u*cos(1/2*x)
+  I_raw          -1/2*u*sin(1/2*x)-1/2*cos(1/2*x)*(-u^2+1)^(1/2)
+  Q              0
+  S              (u*sin(1/2*x)+cos(1/2*x)*(-u^2+1)^(1/2))/(-u^2+1)^(1/2)
+  S_alt          (u*sin(1/2*x)+cos(1/2*x)*(-u^2+1)^(1/2))/(-u^2+1)^(1/2)
+  S_raw          -1/2*(sin(1/2*x)*(-u^2+1)^(1/2)-u*cos(1/2*x))/(-u^2+1)^(1/2)
+  branch         "general"
+  c              0
+  delta          cos(1/2*x)
+  delta2         2*sin(1/2*x)
+  family         v*cos(1/2*x)+(-v^2+1)^(1/2)*sin(1/2*x)
+  kappa          1/4
+  message        "kovacic_success"
+  status         "ok"
+  u_p            0
+  [pass] dI/du = S
+  [pass] dI/dx + S*phi = 0
+  [pass] L(delta) = 0
+  [pass] L(delta2) = 0
+  [pass] family(x0) = v
+  [pass] family'(x0) = phi(x0,v)
+  [pass] family solves the ODE at x = 1/2
+  [pass] family solves the ODE at x = 1
+  [pass] I is constant along the family
+  [pass] L(u_p) = c
+  [pass] u_p(x0) = u_p'(x0) = 0
+  ALL CHECKS PASSED
+
+======================================================================
+ex_6_3_galois_positive.mpl
 ======================================================================
 === A1: alg:delta with delta = x^(1/4) exp(2 sqrt(x)) ===
   I              -exp(2*x^(1/2))/x^(1/4)*((u^2-4*x^(1/2))^(1/2)-u)
@@ -241,55 +188,38 @@ ex_galois_positive.mpl
   ALL CHECKS PASSED
 
 ======================================================================
-ex_kovacic_solver.mpl
+ex_6_5_airy_obstruction.mpl
 ======================================================================
+=== A1: alg:delta with delta = Ai(-x) ===
+  I              u/AiryAi(-x)
+  S              1/AiryAi(-x)
+  S_raw          0
+  beta           0
+  branch         "degenerate"
+  c              0
+  delta          AiryAi(-x)
+  family         AiryAi(-x)*v*3^(2/3)*GAMMA(2/3)
+  kappa          x
+  status         "ok"
+  [pass] dI/du = S
+  [pass] dI/dx + S*phi = 0
+  [pass] L(delta) = 0
+  [pass] family(x0) = v
+  [pass] family'(x0) = phi(x0,v)
+  [pass] family solves the ODE at x = 1
+  [pass] family solves the ODE at x = 2
+  [pass] I is constant along the family
+  ALL CHECKS PASSED
 
-y'' + y = 0            kappa = 1
-  expected solved       actual solved      
-  [pass] Kovacic status as expected
-  [pass] candidate solves L(y) = 0
-  [pass] candidate solves L(y) = 0
-
-y'' - y = 0            kappa = -1
-  expected solved       actual solved      
-  [pass] Kovacic status as expected
-  [pass] candidate solves L(y) = 0
-  [pass] candidate solves L(y) = 0
-
-Euler-Cauchy           kappa = -2/x^2
-  expected solved       actual solved      
-  [pass] Kovacic status as expected
-  [pass] candidate solves L(y) = 0
-  [pass] candidate solves L(y) = 0
-
-Kovacic Example 1      kappa = 3/16/x^2-1/x
-  expected solved       actual solved      
-  [pass] Kovacic status as expected
-  [pass] candidate solves L(y) = 0
-  [pass] candidate solves L(y) = 0
-
-Case 2                 kappa = 1/16*(3+8*x)/x^2
-  expected solved       actual solved      
-  [pass] Kovacic status as expected
-  [pass] candidate solves L(y) = 0
-  [pass] candidate solves L(y) = 0
-
-Case 3                 kappa = 1/4*(x-4)/x/(x-1)^2
-  expected solved       actual solved      
-  [pass] Kovacic status as expected
-  [pass] candidate solves L(y) = 0
-  [pass] candidate solves L(y) = 0
-
-Airy obstruction       kappa = x
-  expected obstruction  actual obstruction 
-  [pass] Kovacic status as expected
-
-Bessel nu = 1          kappa = 1-3/4/x^2
-  expected obstruction  actual obstruction 
-  [pass] Kovacic status as expected
+=== A3: alg:kovacic (must report the obstruction) ===
+  c              0
+  kappa          x
+  message        "the nonlinear ODE has at most one Liouvillian solution over C(x)"
+  status         "obstruction"
+  [pass] status is an obstruction
 
 ======================================================================
-ex_nomaple.mpl
+ex_6_7_nomaple.mpl
 ======================================================================
 === A(phi), curvature and coefficient, with the explicit radicals ===
   A(phi) = 2*u/x^2
@@ -321,7 +251,7 @@ ex_nomaple.mpl
   [pass] Algorithm 1 family = paper family 3 s^2 x^2 + (s^3+3s)/x
 
 ======================================================================
-ex_particular_solution.mpl
+alg_2_particular_solution.mpl
 ======================================================================
   I              1/2*(-x^4+x^2+2*u)/x^2
   S              1/x^2
@@ -383,3 +313,73 @@ ex_particular_solution.mpl
   [pass] u_p(x0) = u_p'(x0) = 0
   [pass] paper family = Algorithm 1 family
   ALL CHECKS PASSED
+
+======================================================================
+alg_3_kovacic_solver.mpl
+======================================================================
+
+y'' + y = 0            kappa = 1
+  expected solved       actual solved      
+  [pass] Kovacic status as expected
+  [pass] candidate solves L(y) = 0
+  [pass] candidate solves L(y) = 0
+
+y'' - y = 0            kappa = -1
+  expected solved       actual solved      
+  [pass] Kovacic status as expected
+  [pass] candidate solves L(y) = 0
+  [pass] candidate solves L(y) = 0
+
+Euler-Cauchy           kappa = -2/x^2
+  expected solved       actual solved      
+  [pass] Kovacic status as expected
+  [pass] candidate solves L(y) = 0
+  [pass] candidate solves L(y) = 0
+
+Kovacic Example 1      kappa = 3/16/x^2-1/x
+  expected solved       actual solved      
+  [pass] Kovacic status as expected
+  [pass] candidate solves L(y) = 0
+  [pass] candidate solves L(y) = 0
+
+Case 2                 kappa = 1/16*(3+8*x)/x^2
+  expected solved       actual solved      
+  [pass] Kovacic status as expected
+  [pass] candidate solves L(y) = 0
+  [pass] candidate solves L(y) = 0
+
+Case 1                 kappa = 1/4*(x-4)/x/(x-1)^2
+  expected solved       actual solved      
+  [pass] Kovacic status as expected
+  [pass] candidate solves L(y) = 0
+  [pass] candidate solves L(y) = 0
+
+Airy obstruction       kappa = x
+  expected obstruction  actual obstruction 
+  [pass] Kovacic status as expected
+
+Bessel nu = 1          kappa = 1-3/4/x^2
+  expected obstruction  actual obstruction 
+  [pass] Kovacic status as expected
+
+======================================================================
+alg_diagnostics.mpl
+======================================================================
+=== outside the class: d_u K <> 0 ===
+alg:delta, phi = u^2                           -> outside_class                  [pass] as expected
+alg:particular, phi = u^2                      -> outside_class                  [pass] as expected
+alg:kovacic, phi = u^2                         -> outside_class                  [pass] as expected
+
+=== invalid auxiliary solution ===
+alg:delta, delta = sin(x) is not a solution    -> invalid_auxiliary_solution     [pass] as expected
+alg:delta, delta(x0) = 0                       -> invalid_auxiliary_solution     [pass] as expected
+alg:delta, delta = 0                           -> invalid_auxiliary_solution     [pass] as expected
+
+=== invalid particular solution ===
+alg:particular, f = x^3                        -> invalid_particular_solution    [pass] as expected
+
+=== curvature not rational: Kovacic does not apply ===
+alg:kovacic, kappa not in C(x)                 -> not_rational                   [pass] as expected
+
+=== obstruction (Maple 2015: kovacicsols is complete) ===
+alg:kovacic, Airy obstruction (kappa = x)      -> obstruction                    [pass] as expected

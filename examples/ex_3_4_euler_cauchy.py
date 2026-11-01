@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
-"""Circle equation (``ex:nonlinear_proj``, equation ``eq:example_sqrt``).
+"""Example 3.4 of the paper: a nonlinear Euler--Cauchy flow (``ex:euler_cauchy``).
 
 Equation:
 
-    u' = (1/2) sqrt(1 - u^2).
+    u' = u/(2x) + (3/(2x)) sqrt(u^2 - 4x),   x > 0.
 
-The curvature is ``kappa = 1/4``.  The paper uses
-``delta(x) = sin(x/2)`` and the family
-``u(x;s) = sin((x-s)/2)``; here we use the independent solution
-``delta(x) = cos(x/2)`` based at ``x0 = 0``.
+The curvature is ``kappa = -2/x^2`` and ``delta = x^2`` solves
+``L(delta) = 0``.  The general solution is
+
+    u(x;s) = s x^2 + 1/(s x).
+
+This script runs ``alg:delta`` and ``alg:kovacic`` on the equation.  See
+``alg_2_particular_solution.py`` for ``alg:particular`` on a simpler affine
+Euler--Cauchy equation.
 """
 
 from __future__ import annotations
@@ -32,27 +36,45 @@ from curvature_kovacic import (
 
 
 def main() -> None:
-    phi = sp.sqrt(1 - u**2) / 2
-    kappa = sp.Rational(1, 4)
-    x0, v0 = 0, 0
-    x_values = [sp.Rational(1, 2), 1]
-    # Generic points used for the identities; they do not lie on the
-    # solution family based at (0, 0).
-    points = [{x: 1, u: 0}, {x: 1, u: sp.Rational(1, 2)}]
+    phi = (
+        u / (2 * x)
+        + sp.Rational(3, 2) / x * sp.sqrt(u**2 - 4 * x)
+    )
+    kappa = -2 / x**2
+    x0, v0 = 2, 5
+    x_values = [sp.Rational(5, 2), 3]
+    points = [
+        {x: 2, u: 5},
+        {x: sp.Rational(5, 2), u: 8},
+        {x: 3, u: 11},
+    ]
 
     print("=" * 78)
-    print("A1: alg:delta with delta = cos(x/2)")
+    print("A1: alg:delta with delta = x^2")
     print("=" * 78)
     result_a1 = solve_from_linear_solution(
-        phi, sp.cos(x / 2), x0=x0, v_value=v0, points=points
+        phi, x**2, x0=x0, v_value=v0, points=points
     )
     _report(result_a1, phi, kappa, x0, v0, x_values)
 
     print("\n" + "=" * 78)
     print("A3: alg:kovacic on the nonlinear phi")
     print("=" * 78)
-    result_a3 = kovacic_integration(phi, x0=x0, v_value=v0, points=points)
+    result_a3 = kovacic_integration(
+        phi, x0=x0, v_value=v0, points=points
+    )
     _report(result_a3, phi, kappa, x0, v0, x_values)
+
+    # The paper prints the family f(x;s) = s x^2 + 1/(s x).  The algorithms
+    # return the same family parametrized by the initial value v = u(x0);
+    # at x0 = 2 the two parameters are related by s = (v + sqrt(v^2 - 8))/8.
+    s_of_v = (v + sp.sqrt(v**2 - 8)) / 8
+    paper_family = s_of_v * x**2 + 1 / (s_of_v * x)
+    assert is_zero(
+        result_a1.family - paper_family,
+        [{x: x0, v: v0}, {x: 3, v: v0}],
+    )
+    print("Family matches f(x;s) = s x^2 + 1/(s x) of the paper.")
 
     print("\nAll checks passed.")
 
@@ -66,9 +88,10 @@ def _report(result, phi, kappa, x0, v0, x_values) -> None:
     print(f"family : {sp.simplify(result.family)}")
 
     assert result.status == "ok", result.message
+    assert is_zero(result.kappa - kappa, points_from_family(result.family, x_values, v0))
+    assert is_zero(result.c, points_from_family(result.family, x_values, v0))
+
     pts = points_from_family(result.family, x_values, v0)
-    assert is_zero(result.kappa - kappa, pts)
-    assert is_zero(result.c, pts)
     assert is_zero(sp.diff(result.I, u) - result.S, pts)
     assert is_zero(sp.diff(result.I, x) + result.S * phi, pts)
     assert is_zero(result.family.subs({x: x0, v: v0}) - v0, [{x: x0, v: v0}])
@@ -83,6 +106,9 @@ def _report(result, phi, kappa, x0, v0, x_values) -> None:
             {x: xv, u: uv}
         )
         assert abs(complex(sp.N(residual, 30))) < 1e-6
+    I_on = result.I.subs(u, result.family.subs({v: v0}))
+    for xv in x_values:
+        assert abs(complex(sp.N(sp.diff(I_on, x).subs({x: xv}), 30))) < 1e-6
 
 
 if __name__ == "__main__":

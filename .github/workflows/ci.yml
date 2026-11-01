@@ -27,13 +27,13 @@ jobs:
         run: pytest -q
 
       - name: Smoke-test the paper example
-        run: python examples/ex_galois_positive.py
+        run: python examples/ex_6_3_galois_positive.py
 
       - name: Smoke-test the remaining examples
         run: |
-          python examples/ex_euler_cauchy.py
-          python examples/ex_particular_solution.py
-          python examples/ex_circle.py
-          python examples/ex_airy_obstruction.py
-          python examples/ex_kovacic_solver.py
-          python examples/ex_nomaple.py
+          python examples/ex_3_4_euler_cauchy.py
+          python examples/alg_2_particular_solution.py
+          python examples/ex_5_6_circle.py
+          python examples/ex_6_5_airy_obstruction.py
+          python examples/alg_3_kovacic_solver.py
+          python examples/ex_6_7_nomaple.py

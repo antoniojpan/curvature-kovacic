@@ -107,7 +107,7 @@ def test_circle_family_is_the_printed_solution():
 
 
 def test_nomaple_script_reproduces_the_printed_example():
-    """Run all exact checks in the companion script for ``ex:nomaple``."""
-    script = Path(__file__).resolve().parents[1] / "examples" / "ex_nomaple.py"
+    """Run all exact checks in the companion script for Example 6.7."""
+    script = Path(__file__).resolve().parents[1] / "examples" / "ex_6_7_nomaple.py"
     namespace = runpy.run_path(str(script))
     namespace["main"]()

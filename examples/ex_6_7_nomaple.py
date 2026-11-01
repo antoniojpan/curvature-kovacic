@@ -1,18 +1,13 @@
 #!/usr/bin/env python3
-"""Paper example ``ex:nomaple``: the ODE on which Maple's dsolve fails.
+"""Example 6.7 of the paper (``ex:nomaple``): the ODE on which Maple's
+dsolve fails.
 
-The right-hand side is used exactly as printed, with its nested radicals:
+The right-hand side is:
 
     R = ((x u + 3x^3 - 2x^9
           + sqrt(x^2 u^2 + 2x^4 (3 - 2x^6) u + 4 - 3x^6))/2)^(1/3)
     S = R + (x^6 - 1)/R - x^3
     u' = 9 x S^2 - u/x,         D = {0 < x < 1, u > 0}.
-
-The algebraic element is deliberately *not* replaced by an abstract
-symbol: that rewrites the example into a different and much easier problem
-(on the RootOf presentation Maple's dsolve returns the general solution in
-0.1 s, whereas on this input it returns NULL in about 1.6 s on Maple
-2015.0), which would make the comparison recorded in the paper meaningless.
 
 The curvature is cheap anyway, because ``A(phi) = phi_x + phi phi_u``
 simplifies to ``2u/x^2`` *before* the derivative in ``u`` is taken:
@@ -52,7 +47,16 @@ def main() -> None:
     phi = 9 * x * S**2 - u / x
     x0 = sp.Rational(1, 2)
 
-    result = kovacic_integration(phi, x0=x0, v_value=1)
+    # Sample points of the numerical zero test: inside the domain
+    # D = {0 < x < 1, u > 0}, on the family 3 s^2 x^2 + (s^3 + 3 s)/x with
+    # s = 1.  (The library default has x > 1, where the radicand is negative.)
+    points = [
+        {x: sp.Rational(1, 2), u: sp.Rational(35, 4)},
+        {x: sp.Rational(1, 4), u: sp.Rational(259, 16)},
+        {x: sp.Rational(3, 4), u: sp.Rational(337, 48)},
+    ]
+
+    result = kovacic_integration(phi, x0=x0, v_value=1, points=points)
 
     print(f"status : {result.status.value} ({result.message})")
     print(f"kappa  : {result.kappa}")

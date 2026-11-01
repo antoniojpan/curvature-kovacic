@@ -1,10 +1,10 @@
 ##############################################################################
-# ex_diagnostics.mpl -- the rejection branches of the three algorithms
+# alg_diagnostics.mpl -- the rejection branches of the three algorithms
 #
 #   A companion implementation is only informative if it can also say "no".
 #   This script exercises every diagnostic status of curvature_kovacic.mpl.
 #
-# Run from this directory:  maple -q < ex_diagnostics.mpl
+# Run from this directory:  maple -q < alg_diagnostics.mpl
 ##############################################################################
 
 restart:

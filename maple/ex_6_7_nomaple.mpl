@@ -1,21 +1,13 @@
 ##############################################################################
-# ex_nomaple.mpl -- paper example ex:nomaple
+# ex_6_7_nomaple.mpl -- Example 6.7 of the paper (ex:nomaple)
 #
 #   The algebraic ODE used in the paper as the benchmark on which Maple's
-#   dsolve returns NULL.  The right-hand side is used exactly as printed,
-#   with its nested radicals:
+#   dsolve returns NULL.  The right-hand side is:
 #
 #       R = ( (x u + 3 x^3 - 2 x^9
 #              + sqrt(x^2 u^2 + 2 x^4 (3 - 2 x^6) u + 4 - 3 x^6)) / 2 )^(1/3)
 #       S = R + (x^6 - 1)/R - x^3
 #       u' = 9 x S^2 - u/x,        D = {0 < x < 1, u > 0}.
-#
-#   The algebraic element is deliberately NOT replaced by a RootOf: that
-#   rewrites the example into a different and much easier problem (on the
-#   RootOf presentation Maple's dsolve returns the general solution in
-#   0.1 seconds, whereas on this input it returns NULL in about 1.6
-#   seconds on Maple 2015.0), which would make the comparison recorded in
-#   the paper meaningless.
 #
 #   The curvature is nevertheless cheap: A(phi) = phi_x + phi phi_u
 #   simplifies to 2u/x^2 before the u-derivative is taken, whence
@@ -27,7 +19,7 @@
 #   too long to be informative, so only its size is reported; the closed
 #   forms printed in the paper are verified instead.
 #
-# Run from this directory:  maple -q < ex_nomaple.mpl
+# Run from this directory:  maple -q < ex_6_7_nomaple.mpl
 ##############################################################################
 
 restart:
@@ -39,24 +31,30 @@ S := R + (x^6 - 1)/R - x^3:
 phi := 9*x*S^2 - u/x:
 x0 := 1/2: v0 := 1:
 
+# Sample points of the numerical zero test: inside the domain
+# D = {0 < x < 1, u > 0}, on the family 3 s^2 x^2 + (s^3 + 3 s)/x with s = 1.
+# The default points have x > 1, where the radicand is negative and Maple
+# evaluates a complex branch, so the numerical test there is meaningless.
+points := [{x = 1/2, u = 35/4}, {x = 1/4, u = 259/16}, {x = 3/4, u = 337/48}]:
+
 printf("=== A(phi), curvature and coefficient, with the explicit radicals ===\n"):
 printf("  A(phi) = %a\n", CK_divergence(phi)):
 printf("  kappa  = %a\n", CK_curvature(phi)):
 printf("  c      = %a\n", CK_c(phi, CK_curvature(phi))):
 
 printf("\n=== A3: alg:kovacic on the printed input ===\n"):
-out := CK_alg_kovacic(phi, x0, v0):
+out := CK_alg_kovacic(phi, x0, v0, points):
 printf("  status = %a   (%a)\n", out["status"], out["message"]):
 printf("  delta  = %a\n", out["delta"]):
 if out["status"] = "ok" then
     printf("  raw output (nested radicals): S = %a chars, I = %a chars, family = %a chars\n",
         length(out["S"]), length(out["I"]), length(out["family"])):
 end if:
-CK_check(out, phi, x0, v0, [1/4, 3/4]):
+CK_check(out, phi, x0, v0, [1/4, 3/4], points):
 
 printf("\n=== closed forms printed in the paper ===\n"):
 printf("  I      = -9 S^2\n"):
-CK_report("I = -9 S^2", CK_zero(out["I"] + 9*S^2)):
+CK_report("I = -9 S^2", CK_zero(out["I"] + 9*S^2, points)):
 
 # The paper's family, on the domain 0 < x < 1.
 printf("  family = 3 s^2 x^2 + (s^3 + 3 s)/x\n"):

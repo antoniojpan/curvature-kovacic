@@ -6,7 +6,9 @@ from curvature_kovacic.kovacic import _SolverLimited
 
 PAPER_KAPPA = sp.Rational(3, 16) / x**2 - 1 / x
 CASE2_KAPPA = (3 + 8 * x) / (16 * x**2)
-CASE3_KAPPA = (x - 4) / (4 * x * (x - 1) ** 2)
+# Case 1 equation (delta = x/sqrt(x-1)); also used to exercise the Case 3
+# code path directly in test_case3_direct_on_case1_input.
+CASE1_KAPPA = (x - 4) / (4 * x * (x - 1) ** 2)
 
 
 @pytest.mark.parametrize(
@@ -17,9 +19,9 @@ CASE3_KAPPA = (x - 4) / (4 * x * (x - 1) ** 2)
         -2 / x**2,
         PAPER_KAPPA,
         CASE2_KAPPA,
-        CASE3_KAPPA,
+        CASE1_KAPPA,
     ],
-    ids=["y''+y", "y''-y", "Euler-2", "paper-Case2", "Case2-b", "Case3"],
+    ids=["y''+y", "y''-y", "Euler-2", "paper-Case2", "Case2-b", "Case1-alt"],
 )
 def test_solved_cases(kappa):
     result = KovacicSolver(x).solve(kappa)
@@ -56,12 +58,12 @@ def test_obstructions(kappa):
     assert result.delta is None
 
 
-def test_case3_direct():
+def test_case3_direct_on_case1_input():
     solver = KovacicSolver(x)
-    delta = solver.case3(-CASE3_KAPPA)
+    delta = solver.case3(-CASE1_KAPPA)
     assert delta is not None
     assert is_zero(
-        sp.diff(delta, x, 2) + CASE3_KAPPA * delta,
+        sp.diff(delta, x, 2) + CASE1_KAPPA * delta,
         [{x: 2}, {x: 3}],
     )
 

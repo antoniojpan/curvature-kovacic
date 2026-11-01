@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Airy obstruction (``ex:airy_obstruction``).
+"""Example 6.5 of the paper: the Airy obstruction (``ex:airy_obstruction``).
 
 The linear equation is ``u' = (y'/y) u`` where ``y`` solves the Airy
 equation ``y'' + x y = 0``.  Its curvature is ``kappa = x``.  Over
